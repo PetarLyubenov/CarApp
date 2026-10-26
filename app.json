@@ -25,7 +25,14 @@
       "expo-router",
       "expo-status-bar",
       "expo-sqlite",
-      "expo-localization"
+      "expo-localization",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos so you can share cars you spotted.",
+          "cameraPermission": "Allow $(PRODUCT_NAME) to use the camera so you can photograph cars you spot."
+        }
+      ]
     ],
     "scheme": "carapp",
     "experiments": {

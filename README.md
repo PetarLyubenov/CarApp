@@ -29,9 +29,12 @@ src/
   constants/theme.ts   # Colors and spacing
   context/             # App-wide state (AuthContext)
   i18n/                # Translations
+  data/carMakes.ts     # Car makes and models for the pickers
   lib/supabase.ts      # Supabase client
+  services/            # Database + storage logic (spots.ts)
   types/database.ts    # Types matching the database tables
 supabase/schema.sql    # Database tables + security rules
+supabase/storage.sql   # Photo storage bucket + rules
 ```
 
 ## Getting started
@@ -43,6 +46,7 @@ supabase/schema.sql    # Database tables + security rules
 2. **Set up Supabase**
    - Create a project at [supabase.com](https://supabase.com).
    - Open **SQL Editor**, paste the content of `supabase/schema.sql` and run it.
+   - Then do the same with `supabase/storage.sql` (photo storage).
    - Copy `.env.example` to `.env.local` and fill in the URL and the publishable key from **Project Settings → API Keys**.
 3. **Run the app**
    ```bash
@@ -64,8 +68,9 @@ supabase/schema.sql    # Database tables + security rules
 
 - [x] Project setup, navigation, authentication
 - [x] Database schema with row level security
-- [ ] Upload spots (camera/gallery, make/model picker, strip GPS data)
-- [ ] Feed with likes and comments
+- [x] Upload spots (camera/gallery, make/model picker, strip GPS data)
+- [x] Feed of spots
+- [ ] Likes and comments
 - [ ] Search by make/model
 - [ ] Garage: cars, specs, modifications
 - [ ] Friends and privacy (public / friends only)
