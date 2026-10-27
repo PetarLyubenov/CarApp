@@ -1,6 +1,6 @@
 -- =============================================================================
 -- Photo storage for the garage (your own cars).
--- Run once in Supabase: Dashboard -> SQL Editor -> New query -> paste -> Run.
+-- Run in Supabase (safe to run again): Dashboard -> SQL Editor -> New query -> paste -> Run.
 -- (Run schema.sql first — these rules look up the garage tables.)
 --
 -- Same idea as storage.sql for spots: a PRIVATE bucket, files under
@@ -12,12 +12,14 @@ values ('garage', 'garage', false, 10485760, array['image/jpeg']) -- max 10 MB, 
 on conflict (id) do nothing;
 
 -- Upload: only into your own folder.
+drop policy if exists "garage photos: upload own" on storage.objects;
 create policy "garage photos: upload own" on storage.objects
   for insert to authenticated
   with check (bucket_id = 'garage' and (storage.foldername(name))[1] = auth.uid()::text);
 
 -- Read: your own photos, or photos of a car you are allowed to see.
 -- The `exists` check goes through the garage read rules (public / own / friends).
+drop policy if exists "garage photos: read visible" on storage.objects;
 create policy "garage photos: read visible" on storage.objects
   for select to authenticated
   using (
@@ -29,6 +31,7 @@ create policy "garage photos: read visible" on storage.objects
   );
 
 -- Delete: only your own photos.
+drop policy if exists "garage photos: delete own" on storage.objects;
 create policy "garage photos: delete own" on storage.objects
   for delete to authenticated
   using (bucket_id = 'garage' and (storage.foldername(name))[1] = auth.uid()::text);
