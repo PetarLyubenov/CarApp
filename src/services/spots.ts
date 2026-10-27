@@ -205,9 +205,9 @@ function toSearchWords(text: string): string[] {
 }
 
 /**
- * Search spots by make, model and year.
- * Every word must match somewhere: "porsche 911" finds make "Porsche" + model "911 GT3".
- * A 4-digit word also matches the year ("2008 m3").
+ * Search spots by make, model, city and year.
+ * Every word must match somewhere: "porsche 911" finds make "Porsche" + model "911 GT3",
+ * "bmw sofia" finds BMWs spotted in Sofia. A 4-digit word also matches the year ("2008 m3").
  */
 export async function searchSpots(text: string, limit = 60): Promise<FeedSpot[]> {
   const words = toSearchWords(text);
@@ -217,7 +217,7 @@ export async function searchSpots(text: string, limit = 60): Promise<FeedSpot[]>
 
   for (const word of words) {
     // `ilike` = case-insensitive LIKE; `*` is the wildcard (same as % in SQL).
-    const conditions = [`make.ilike.*${word}*`, `model.ilike.*${word}*`];
+    const conditions = [`make.ilike.*${word}*`, `model.ilike.*${word}*`, `city.ilike.*${word}*`];
     if (/^\d{4}$/.test(word)) conditions.push(`year.eq.${word}`);
     // Each .or(...) is one group; several groups are combined with AND.
     query = query.or(conditions.join(','));

@@ -38,7 +38,7 @@ const en = {
     friendsOnly: 'Friends only',
   },
   search: {
-    placeholder: 'Search make, model or year…',
+    placeholder: 'Search make, model, city or year…',
     popularMakes: 'Browse by make',
     noResults: 'No cars found for "{{query}}".',
     results_one: '{{count}} result',

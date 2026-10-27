@@ -73,7 +73,7 @@ supabase/spot_photos.sql # Several photos per spot
 - [x] Upload spots (up to 10 photos, camera/gallery, make/model picker, strip GPS data)
 - [x] Feed of spots with swipeable photos
 - [ ] Likes and comments
-- [x] Search by make, model and year, with spot detail screen
+- [x] Search by make, model, city and year, with spot detail screen
 - [ ] Garage: cars, specs, modifications
 - [ ] Friends and privacy (public / friends only)
 - [ ] Events list, details, "going / interested"

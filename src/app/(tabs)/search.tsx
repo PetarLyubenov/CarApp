@@ -1,5 +1,5 @@
 /**
- * Search tab — find spotted cars by make, model or year.
+ * Search tab — find spotted cars by make, model, city or year.
  *
  * Searching starts automatically 300 ms after the user stops typing ("debounce"),
  * so we don't send a request for every single letter.
