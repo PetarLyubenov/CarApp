@@ -10,7 +10,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
 import { colors, spacing } from '@/constants/theme';
-import type { LocalPhoto } from '@/services/spots';
+import type { LocalPhoto } from '@/services/photos';
 
 type Props = {
   photos: LocalPhoto[];

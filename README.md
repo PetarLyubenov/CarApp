@@ -26,17 +26,19 @@ src/
     (auth)/            # Sign in / sign up
     (tabs)/            # Feed, Search, Upload, Garage, Events
     spot/[id].tsx      # Spot details (opened from search)
+    garage/            # Add car, car details, add modification
   components/          # Reusable UI (Button, TextField, ...)
   constants/theme.ts   # Colors and spacing
   context/             # App-wide state (AuthContext)
   i18n/                # Translations
   data/carMakes.ts     # Car makes and models for the pickers
   lib/supabase.ts      # Supabase client
-  services/            # Database + storage logic (spots.ts)
+  services/            # Database + storage logic (spots, garage, photos)
   types/database.ts    # Types matching the database tables
 supabase/schema.sql    # Database tables + security rules
 supabase/storage.sql   # Photo storage bucket + rules
 supabase/spot_photos.sql # Several photos per spot
+supabase/garage.sql    # Garage photo storage + rules
 ```
 
 ## Getting started
@@ -48,7 +50,7 @@ supabase/spot_photos.sql # Several photos per spot
 2. **Set up Supabase**
    - Create a project at [supabase.com](https://supabase.com).
    - Open **SQL Editor**, paste the content of `supabase/schema.sql` and run it.
-   - Then do the same with `supabase/storage.sql` (photo storage) and `supabase/spot_photos.sql` (several photos per spot).
+   - Then do the same with `supabase/storage.sql` (photo storage) `supabase/spot_photos.sql` (several photos per spot) and `supabase/garage.sql` (garage photos).
    - Copy `.env.example` to `.env.local` and fill in the URL and the publishable key from **Project Settings → API Keys**.
 3. **Run the app**
    ```bash
@@ -74,7 +76,7 @@ supabase/spot_photos.sql # Several photos per spot
 - [x] Feed of spots with swipeable photos
 - [ ] Likes and comments
 - [x] Search by make, model, city and year, with spot detail screen
-- [ ] Garage: cars, specs, modifications
+- [x] Garage: cars, specs, modifications with dates and costs
 - [ ] Friends and privacy (public / friends only)
 - [ ] Events list, details, "going / interested"
 - [ ] Organization verification flow

@@ -4,23 +4,17 @@
  * Screens call these functions instead of talking to Supabase directly
  * (like a repository/service class in C#), so the screens stay focused on the UI.
  */
-import { File } from 'expo-file-system';
-import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
-
 import { supabase } from '@/lib/supabase';
+import {
+  orderedPaths,
+  removePhotos,
+  signPhotoUrls,
+  uploadPhotos,
+  type LocalPhoto,
+} from '@/services/photos';
 import type { Spot, Visibility } from '@/types/database';
 
 const BUCKET = 'spots';
-/** Photos wider than this are scaled down: smaller uploads, faster feed. */
-const MAX_WIDTH = 1600;
-/** How long a signed photo link stays valid. */
-const SIGNED_URL_SECONDS = 60 * 60;
-
-/** Most photos one spot can have. */
-export const MAX_PHOTOS = 10;
-
-/** A photo picked on the phone, not uploaded yet. */
-export type LocalPhoto = { uri: string; width: number };
 
 export type NewSpot = {
   userId: string;
@@ -42,45 +36,6 @@ export type FeedSpot = Spot & {
 };
 
 /**
- * Re-encode the photo as a new JPEG.
- * Besides resizing, this drops the original EXIF metadata — including the GPS location
- * where the photo was taken — so we never publish where someone lives or parks.
- */
-async function prepareImage(uri: string, width: number): Promise<string> {
-  const context = ImageManipulator.manipulate(uri);
-  if (width > MAX_WIDTH) {
-    context.resize({ width: MAX_WIDTH, height: null }); // height keeps the aspect ratio
-  }
-  const rendered = await context.renderAsync();
-  const result = await rendered.saveAsync({
-    format: SaveFormat.JPEG,
-    compress: 0.8,
-  });
-  return result.uri;
-}
-
-/** Short random file name, e.g. "1730000000000-k3j9x2.jpg". */
-function makeFileName(): string {
-  const random = Math.random().toString(36).slice(2, 8);
-  return `${Date.now()}-${random}.jpg`;
-}
-
-/** Prepare one photo and upload it. Returns its path in storage. */
-async function uploadPhoto(userId: string, photo: LocalPhoto): Promise<string> {
-  const preparedUri = await prepareImage(photo.uri, photo.width);
-  const bytes = await new File(preparedUri).arrayBuffer();
-
-  // Storage rule: users may only upload into a folder named after their own id.
-  const path = `${userId}/${makeFileName()}`;
-
-  const { error } = await supabase.storage
-    .from(BUCKET)
-    .upload(path, bytes, { contentType: 'image/jpeg' });
-  if (error) throw error;
-  return path;
-}
-
-/**
  * Upload all photos, then save the spot and its photo list.
  * If anything fails half-way, everything already uploaded is removed again,
  * so we never leave a spot without photos or photos without a spot.
@@ -88,15 +43,10 @@ async function uploadPhoto(userId: string, photo: LocalPhoto): Promise<string> {
 export async function uploadSpot(spot: NewSpot): Promise<void> {
   if (spot.photos.length === 0) throw new Error('A spot needs at least one photo.');
 
-  const uploadedPaths: string[] = [];
+  const uploadedPaths = await uploadPhotos(BUCKET, spot.userId, spot.photos);
   let spotId: string | null = null;
 
   try {
-    // One after another (not all at once) to keep memory and mobile data use low.
-    for (const photo of spot.photos) {
-      uploadedPaths.push(await uploadPhoto(spot.userId, photo));
-    }
-
     // `.select('id').single()` makes the insert return the new row's id.
     const { data, error: spotError } = await supabase
       .from('spots')
@@ -122,7 +72,7 @@ export async function uploadSpot(spot: NewSpot): Promise<void> {
   } catch (e) {
     // Undo: deleting the spot also deletes its photo rows (on delete cascade).
     if (spotId) await supabase.from('spots').delete().eq('id', spotId);
-    if (uploadedPaths.length > 0) await supabase.storage.from(BUCKET).remove(uploadedPaths);
+    await removePhotos(BUCKET, uploadedPaths);
     throw e;
   }
 }
@@ -150,23 +100,11 @@ async function toFeedSpots(rows: SpotRow[], { coverOnly = false } = {}): Promise
   // Photo paths per spot, in order. Spots without photo rows fall back to the cover.
   const pathsBySpot = new Map(
     rows.map((row) => {
-      const paths =
-        row.photos.length > 0
-          ? [...row.photos].sort((a, b) => a.position - b.position).map((p) => p.image_path)
-          : [row.image_path];
+      const paths = orderedPaths(row.photos, row.image_path);
       return [row.id, coverOnly ? paths.slice(0, 1) : paths];
     }),
   );
-
-  // The bucket is private, so each photo needs a temporary signed link.
-  // One request for all photos instead of one per photo.
-  const allPaths = [...pathsBySpot.values()].flat();
-  const { data: signed, error: signError } = await supabase.storage
-    .from(BUCKET)
-    .createSignedUrls(allPaths, SIGNED_URL_SECONDS);
-  if (signError) throw signError;
-
-  const urlByPath = new Map(signed.map((item) => [item.path, item.signedUrl]));
+  const urlByPath = await signPhotoUrls(BUCKET, [...pathsBySpot.values()].flat());
 
   return rows.map(({ author, photos: _photos, ...spot }) => ({
     ...spot,

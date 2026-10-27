@@ -2,7 +2,7 @@
  * Upload tab — photograph or pick car photos, describe the car and share it.
  */
 import { useEffect, useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text } from 'react-native';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
@@ -11,11 +11,13 @@ import { PhotoPicker } from '@/components/PhotoPicker';
 import { PickerModal } from '@/components/PickerModal';
 import { SelectField } from '@/components/SelectField';
 import { TextField } from '@/components/TextField';
+import { VisibilityToggle } from '@/components/VisibilityToggle';
 import { colors, spacing } from '@/constants/theme';
 import { useAuth } from '@/context/AuthContext';
 import { CAR_MAKES, MAKE_NAMES } from '@/data/carMakes';
 import { getErrorMessage } from '@/lib/errors';
-import { fetchDefaultVisibility, MAX_PHOTOS, uploadSpot, type LocalPhoto } from '@/services/spots';
+import { MAX_PHOTOS, type LocalPhoto } from '@/services/photos';
+import { fetchDefaultVisibility, uploadSpot } from '@/services/spots';
 import type { Visibility } from '@/types/database';
 
 export default function UploadScreen() {
@@ -124,21 +126,7 @@ export default function UploadScreen() {
           style={styles.multiline}
         />
 
-        {/* ---- Visibility ---- */}
-        <Text style={styles.label}>{t('upload.visibility')}</Text>
-        <View style={styles.segment}>
-          {(['public', 'friends'] as const).map((option) => (
-            <Pressable
-              key={option}
-              onPress={() => setVisibility(option)}
-              style={[styles.segmentItem, visibility === option && styles.segmentActive]}
-            >
-              <Text style={[styles.segmentText, visibility === option && styles.segmentTextActive]}>
-                {t(option === 'public' ? 'upload.public' : 'upload.friends')}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
+        <VisibilityToggle value={visibility} onChange={setVisibility} />
 
         {error && <Text style={styles.error}>{error}</Text>}
 
@@ -177,11 +165,5 @@ const styles = StyleSheet.create({
   flex: { flex: 1, backgroundColor: colors.background },
   content: { padding: spacing.md, gap: spacing.md, paddingBottom: spacing.xl },
   multiline: { minHeight: 90, textAlignVertical: 'top' },
-  label: { fontSize: 14, fontWeight: '500', color: colors.text },
-  segment: { flexDirection: 'row', backgroundColor: colors.card, borderRadius: 12, padding: 4, marginTop: -spacing.sm },
-  segmentItem: { flex: 1, paddingVertical: 10, borderRadius: 9, alignItems: 'center' },
-  segmentActive: { backgroundColor: colors.background, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 4, shadowOffset: { width: 0, height: 1 }, elevation: 2 },
-  segmentText: { color: colors.textMuted, fontWeight: '500' },
-  segmentTextActive: { color: colors.text, fontWeight: '600' },
   error: { color: colors.error },
 });

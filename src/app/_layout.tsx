@@ -12,9 +12,17 @@ import '@/i18n'; // initialize translations before any screen renders
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { useTranslation } from 'react-i18next';
 
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { colors } from '@/constants/theme';
+
+/** Header settings shared by screens that open on top of the tabs. */
+const pushedScreen = {
+  headerShown: true,
+  headerBackButtonDisplayMode: 'minimal',
+  headerTintColor: colors.primary,
+} as const;
 
 export default function RootLayout() {
   return (
@@ -27,6 +35,7 @@ export default function RootLayout() {
 
 function RootNavigator() {
   const { session, isLoading } = useAuth();
+  const { t } = useTranslation();
 
   // While checking for a saved session, show a spinner instead of the login screen.
   if (isLoading) {
@@ -45,10 +54,14 @@ function RootNavigator() {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Protected guard={isSignedIn}>
         <Stack.Screen name="(tabs)" />
-        {/* Opens on top of the tabs, with a back button */}
+        {/* These open on top of the tabs, with a back button */}
+        <Stack.Screen name="spot/[id]" options={{ ...pushedScreen, title: '' }} />
+        <Stack.Screen name="garage/new" options={{ ...pushedScreen, title: t('garage.newCar') }} />
+        <Stack.Screen name="garage/[id]/index" options={{ ...pushedScreen, title: '' }} />
+        {/* A sheet that slides up over the car screen */}
         <Stack.Screen
-          name="spot/[id]"
-          options={{ headerShown: true, title: '', headerBackButtonDisplayMode: 'minimal', headerTintColor: colors.primary }}
+          name="garage/[id]/add-mod"
+          options={{ ...pushedScreen, title: t('garage.newMod'), presentation: 'modal' }}
         />
       </Stack.Protected>
       <Stack.Protected guard={!isSignedIn}>
