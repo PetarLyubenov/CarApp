@@ -1,13 +1,14 @@
 /**
  * Photo helpers shared by spots and the garage: prepare, upload, delete and sign links.
- * Each feature has its own private storage bucket ('spots', 'garage').
+ * Each feature has its own storage bucket: 'spots' and 'garage' are private,
+ * 'events' is public (event covers are meant for everyone).
  */
 import { File } from 'expo-file-system';
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 
 import { supabase } from '@/lib/supabase';
 
-export type PhotoBucket = 'spots' | 'garage';
+export type PhotoBucket = 'spots' | 'garage' | 'events';
 
 /** Most photos one spot or car can have. */
 export const MAX_PHOTOS = 10;
@@ -94,6 +95,11 @@ export async function signPhotoUrls(bucket: PhotoBucket, paths: string[]): Promi
     if (item.path && item.signedUrl) urls.set(item.path, item.signedUrl);
   }
   return urls;
+}
+
+/** Permanent link to a photo in a PUBLIC bucket (no signing needed). */
+export function publicPhotoUrl(bucket: PhotoBucket, path: string): string {
+  return supabase.storage.from(bucket).getPublicUrl(path).data.publicUrl;
 }
 
 /** Photo rows sorted by position, as paths. Falls back to `cover` when there are none. */

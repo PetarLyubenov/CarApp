@@ -145,3 +145,17 @@ export type EventAttendee = {
   status: AttendanceStatus;
   created_at: string;
 };
+
+export type OrganizationRequestStatus = 'pending' | 'approved' | 'rejected';
+
+/** A user's application to become a verified organization (supabase/events.sql). */
+export type OrganizationRequest = {
+  id: string;
+  user_id: string;
+  org_name: string;
+  website: string | null;
+  message: string | null;
+  status: OrganizationRequestStatus;
+  created_at: string;
+  reviewed_at: string | null;
+};

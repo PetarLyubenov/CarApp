@@ -13,13 +13,9 @@ import { PhotoCarousel } from '@/components/PhotoCarousel';
 import { colors, spacing } from '@/constants/theme';
 import { useAuth } from '@/context/AuthContext';
 import { getErrorMessage } from '@/lib/errors';
+import { formatEuro } from '@/lib/format';
 import { deleteCar, deleteModification, fetchCar, type CarDetails } from '@/services/garage';
 import type { Modification } from '@/types/database';
-
-/** "450" or "450.50" with a € sign. */
-function formatEuro(amount: number): string {
-  return `€${Number.isInteger(amount) ? amount : amount.toFixed(2)}`;
-}
 
 export default function CarScreen() {
   const { t, i18n } = useTranslation();

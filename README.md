@@ -27,6 +27,8 @@ src/
     (tabs)/            # Feed, Search, Upload, Garage, Events
     spot/[id].tsx      # Spot details (opened from search)
     garage/            # Add car, car details, add modification
+    events/            # Event details, create event, apply as organizer
+    admin/             # Review organizer applications
   components/          # Reusable UI (Button, TextField, ...)
   constants/theme.ts   # Colors and spacing
   context/             # App-wide state (AuthContext)
@@ -40,6 +42,7 @@ supabase/storage.sql   # Photo storage bucket + rules
 supabase/spot_photos.sql # Several photos per spot
 supabase/garage.sql    # Garage photo storage + rules
 supabase/fuel_type.sql # Fuel type column for garage cars
+supabase/events.sql    # Event covers + organizer applications
 ```
 
 ## Getting started
@@ -51,7 +54,7 @@ supabase/fuel_type.sql # Fuel type column for garage cars
 2. **Set up Supabase**
    - Create a project at [supabase.com](https://supabase.com).
    - Open **SQL Editor**, paste the content of `supabase/schema.sql` and run it.
-   - Then do the same with `supabase/storage.sql` (photo storage) `supabase/spot_photos.sql` (several photos per spot), `supabase/garage.sql` (garage photos) and `supabase/fuel_type.sql` (fuel type for cars).
+   - Then do the same with `supabase/storage.sql` (photo storage) `supabase/spot_photos.sql` (several photos per spot), `supabase/garage.sql` (garage photos), `supabase/fuel_type.sql` (fuel type for cars) and `supabase/events.sql` (events and organizer applications).
    - Copy `.env.example` to `.env.local` and fill in the URL and the publishable key from **Project Settings → API Keys**.
 3. **Run the app**
    ```bash
@@ -67,6 +70,7 @@ supabase/fuel_type.sql # Fuel type column for garage cars
 
 - **user**: posts spots, manages a garage, adds friends.
 - **organization**: like a user, plus can create events once verified by an admin.
+  Users apply from the Events tab; admins approve them in the app.
 - **admin**: verifies organizations and moderates content.
 
 ## Roadmap
@@ -79,8 +83,8 @@ supabase/fuel_type.sql # Fuel type column for garage cars
 - [x] Search by make, model, city and year, with spot detail screen
 - [x] Garage: cars, specs, modifications with dates and costs
 - [ ] Friends and privacy (public / friends only)
-- [ ] Events list, details, "going / interested"
-- [ ] Organization verification flow
+- [x] Events list, details, "going / interested"
+- [x] Organization verification flow (apply in the app, admin approves)
 - [ ] Notifications
 - [ ] Bulgarian translation
 - [ ] Publish to App Store and Google Play

@@ -58,6 +58,10 @@ function RootNavigator() {
         <Stack.Screen name="spot/[id]" options={{ ...pushedScreen, title: '' }} />
         <Stack.Screen name="garage/new" options={{ ...pushedScreen, title: t('garage.newCar') }} />
         <Stack.Screen name="garage/[id]/index" options={{ ...pushedScreen, title: '' }} />
+        <Stack.Screen name="events/[id]" options={{ ...pushedScreen, title: '' }} />
+        <Stack.Screen name="events/new" options={{ ...pushedScreen, title: t('events.newEvent') }} />
+        <Stack.Screen name="events/apply" options={{ ...pushedScreen, title: t('organizer.applyTitle') }} />
+        <Stack.Screen name="admin/requests" options={{ ...pushedScreen, title: t('organizer.reviewTitle') }} />
         {/* A sheet that slides up over the car screen */}
         <Stack.Screen
           name="garage/[id]/add-mod"
