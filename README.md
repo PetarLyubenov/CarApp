@@ -39,6 +39,7 @@ supabase/schema.sql    # Database tables + security rules
 supabase/storage.sql   # Photo storage bucket + rules
 supabase/spot_photos.sql # Several photos per spot
 supabase/garage.sql    # Garage photo storage + rules
+supabase/fuel_type.sql # Fuel type column for garage cars
 ```
 
 ## Getting started
@@ -50,7 +51,7 @@ supabase/garage.sql    # Garage photo storage + rules
 2. **Set up Supabase**
    - Create a project at [supabase.com](https://supabase.com).
    - Open **SQL Editor**, paste the content of `supabase/schema.sql` and run it.
-   - Then do the same with `supabase/storage.sql` (photo storage) `supabase/spot_photos.sql` (several photos per spot) and `supabase/garage.sql` (garage photos).
+   - Then do the same with `supabase/storage.sql` (photo storage) `supabase/spot_photos.sql` (several photos per spot), `supabase/garage.sql` (garage photos) and `supabase/fuel_type.sql` (fuel type for cars).
    - Copy `.env.example` to `.env.local` and fill in the URL and the publishable key from **Project Settings → API Keys**.
 3. **Run the app**
    ```bash

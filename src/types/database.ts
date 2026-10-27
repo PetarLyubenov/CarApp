@@ -9,6 +9,16 @@ export type Visibility = 'public' | 'friends';
 export type FriendshipStatus = 'pending' | 'accepted';
 export type EventType = 'show' | 'meet' | 'track_day' | 'other';
 export type AttendanceStatus = 'going' | 'interested';
+export type FuelType =
+  | 'petrol'
+  | 'diesel'
+  | 'hybrid'
+  | 'plugin_hybrid'
+  | 'mild_hybrid'
+  | 'electric'
+  | 'lpg'
+  | 'cng'
+  | 'hydrogen';
 export type ModCategory =
   | 'engine'
   | 'exhaust'
@@ -80,6 +90,7 @@ export type GarageCar = {
   nickname: string | null;
   engine: string | null;
   horsepower: number | null;
+  fuel_type: FuelType | null;
   transmission: string | null;
   drivetrain: string | null;
   color: string | null;

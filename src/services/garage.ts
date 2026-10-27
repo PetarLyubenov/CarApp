@@ -9,7 +9,7 @@ import {
   uploadPhotos,
   type LocalPhoto,
 } from '@/services/photos';
-import type { GarageCar, ModCategory, Modification, Visibility } from '@/types/database';
+import type { FuelType, GarageCar, ModCategory, Modification, Visibility } from '@/types/database';
 
 const BUCKET = 'garage';
 
@@ -23,6 +23,7 @@ export type NewCar = {
   nickname: string | null;
   engine: string | null;
   horsepower: number | null;
+  fuelType: FuelType | null;
   transmission: string | null;
   drivetrain: string | null;
   color: string | null;
@@ -139,6 +140,7 @@ export async function createCar(car: NewCar): Promise<string> {
         nickname: car.nickname,
         engine: car.engine,
         horsepower: car.horsepower,
+        fuel_type: car.fuelType,
         transmission: car.transmission,
         drivetrain: car.drivetrain,
         color: car.color,

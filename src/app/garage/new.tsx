@@ -20,9 +20,21 @@ import { getErrorMessage } from '@/lib/errors';
 import { createCar } from '@/services/garage';
 import { MAX_PHOTOS, type LocalPhoto } from '@/services/photos';
 import { fetchDefaultVisibility } from '@/services/spots';
-import type { Visibility } from '@/types/database';
+import type { FuelType, Visibility } from '@/types/database';
 
 // Stored in the database as these short codes; shown translated.
+// Same values as the check in supabase/fuel_type.sql.
+const FUEL_TYPES: FuelType[] = [
+  'petrol',
+  'diesel',
+  'hybrid',
+  'plugin_hybrid',
+  'mild_hybrid',
+  'electric',
+  'lpg',
+  'cng',
+  'hydrogen',
+];
 const TRANSMISSIONS = ['manual', 'automatic', 'dct', 'cvt'] as const;
 const DRIVETRAINS = ['fwd', 'rwd', 'awd', '4wd'] as const;
 type Transmission = (typeof TRANSMISSIONS)[number];
@@ -41,6 +53,7 @@ export default function NewCarScreen() {
   const [nickname, setNickname] = useState('');
   const [engine, setEngine] = useState('');
   const [horsepower, setHorsepower] = useState('');
+  const [fuelType, setFuelType] = useState<FuelType | null>(null);
   const [transmission, setTransmission] = useState<Transmission | null>(null);
   const [drivetrain, setDrivetrain] = useState<Drivetrain | null>(null);
   const [color, setColor] = useState('');
@@ -90,6 +103,7 @@ export default function NewCarScreen() {
         nickname: nickname.trim() || null,
         engine: engine.trim() || null,
         horsepower: hp,
+        fuelType,
         transmission,
         drivetrain,
         color: color.trim() || null,
@@ -136,6 +150,12 @@ export default function NewCarScreen() {
 
         {/* ---- Specs (all optional) ---- */}
         <Text style={styles.section}>{t('garage.specs')}</Text>
+        <ChipSelect
+          label={t('garage.fuelType')}
+          options={FUEL_TYPES.map((value) => ({ value, label: t(`fuelTypes.${value}`) }))}
+          value={fuelType}
+          onChange={setFuelType}
+        />
         <TextField
           label={t('garage.engine')}
           placeholder={t('garage.enginePlaceholder')}

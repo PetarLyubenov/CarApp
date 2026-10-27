@@ -68,6 +68,7 @@ export default function CarScreen() {
     value && i18n.exists(`${group}.${value}`) ? t(`${group}.${value}`) : value;
 
   const specs: [string, string | null][] = [
+    [t('garage.fuelType'), translated('fuelTypes', car.fuel_type)],
     [t('garage.engine'), car.engine],
     [t('garage.horsepower'), car.horsepower ? `${car.horsepower} hp` : null],
     [t('garage.transmission'), translated('transmissions', car.transmission)],
