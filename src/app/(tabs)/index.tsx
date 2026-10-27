@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 
 import { SpotCard } from '@/components/SpotCard';
 import { colors, spacing } from '@/constants/theme';
+import { getErrorMessage } from '@/lib/errors';
 import { fetchFeed, type FeedSpot } from '@/services/spots';
 
 export default function FeedScreen() {
@@ -23,7 +24,7 @@ export default function FeedScreen() {
       setError(null);
       setSpots(await fetchFeed());
     } catch (e) {
-      setError(e instanceof Error ? e.message : t('common.error'));
+      setError(getErrorMessage(e, t('common.error')));
     } finally {
       setLoading(false);
       setRefreshing(false);

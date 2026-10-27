@@ -16,10 +16,16 @@ const MAX_WIDTH = 1600;
 /** How long a signed photo link stays valid. */
 const SIGNED_URL_SECONDS = 60 * 60;
 
+/** Most photos one spot can have. */
+export const MAX_PHOTOS = 10;
+
+/** A photo picked on the phone, not uploaded yet. */
+export type LocalPhoto = { uri: string; width: number };
+
 export type NewSpot = {
   userId: string;
-  imageUri: string;
-  imageWidth: number;
+  /** In display order — the first photo becomes the cover. */
+  photos: LocalPhoto[];
   make: string;
   model: string;
   year: number | null;
@@ -28,10 +34,11 @@ export type NewSpot = {
   visibility: Visibility;
 };
 
-/** A spot ready to show in the feed: includes the author's username and a photo link. */
+/** A spot ready to show in the feed: includes the author's username and photo links. */
 export type FeedSpot = Spot & {
   username: string;
-  imageUrl: string | null;
+  /** Signed links to all photos, cover first. */
+  imageUrls: string[];
 };
 
 /**
@@ -58,36 +65,65 @@ function makeFileName(): string {
   return `${Date.now()}-${random}.jpg`;
 }
 
-/**
- * Upload the photo to storage, then save the spot row.
- * If saving the row fails, the uploaded photo is deleted so no orphan files are left.
- */
-export async function uploadSpot(spot: NewSpot): Promise<void> {
-  const preparedUri = await prepareImage(spot.imageUri, spot.imageWidth);
+/** Prepare one photo and upload it. Returns its path in storage. */
+async function uploadPhoto(userId: string, photo: LocalPhoto): Promise<string> {
+  const preparedUri = await prepareImage(photo.uri, photo.width);
   const bytes = await new File(preparedUri).arrayBuffer();
 
   // Storage rule: users may only upload into a folder named after their own id.
-  const path = `${spot.userId}/${makeFileName()}`;
+  const path = `${userId}/${makeFileName()}`;
 
-  const { error: uploadError } = await supabase.storage
+  const { error } = await supabase.storage
     .from(BUCKET)
     .upload(path, bytes, { contentType: 'image/jpeg' });
-  if (uploadError) throw uploadError;
+  if (error) throw error;
+  return path;
+}
 
-  const { error: insertError } = await supabase.from('spots').insert({
-    user_id: spot.userId,
-    image_path: path,
-    make: spot.make,
-    model: spot.model,
-    year: spot.year,
-    city: spot.city,
-    description: spot.description,
-    visibility: spot.visibility,
-  });
+/**
+ * Upload all photos, then save the spot and its photo list.
+ * If anything fails half-way, everything already uploaded is removed again,
+ * so we never leave a spot without photos or photos without a spot.
+ */
+export async function uploadSpot(spot: NewSpot): Promise<void> {
+  if (spot.photos.length === 0) throw new Error('A spot needs at least one photo.');
 
-  if (insertError) {
-    await supabase.storage.from(BUCKET).remove([path]);
-    throw insertError;
+  const uploadedPaths: string[] = [];
+  let spotId: string | null = null;
+
+  try {
+    // One after another (not all at once) to keep memory and mobile data use low.
+    for (const photo of spot.photos) {
+      uploadedPaths.push(await uploadPhoto(spot.userId, photo));
+    }
+
+    // `.select('id').single()` makes the insert return the new row's id.
+    const { data, error: spotError } = await supabase
+      .from('spots')
+      .insert({
+        user_id: spot.userId,
+        image_path: uploadedPaths[0], // cover photo
+        make: spot.make,
+        model: spot.model,
+        year: spot.year,
+        city: spot.city,
+        description: spot.description,
+        visibility: spot.visibility,
+      })
+      .select('id')
+      .single();
+    if (spotError) throw spotError;
+    spotId = data.id as string;
+
+    const { error: photosError } = await supabase.from('spot_photos').insert(
+      uploadedPaths.map((path, index) => ({ spot_id: spotId, image_path: path, position: index })),
+    );
+    if (photosError) throw photosError;
+  } catch (e) {
+    // Undo: deleting the spot also deletes its photo rows (on delete cascade).
+    if (spotId) await supabase.from('spots').delete().eq('id', spotId);
+    if (uploadedPaths.length > 0) await supabase.storage.from(BUCKET).remove(uploadedPaths);
+    throw e;
   }
 }
 
@@ -96,33 +132,52 @@ export async function uploadSpot(spot: NewSpot): Promise<void> {
  * The database security rules already filter out other people's "friends only" spots.
  */
 export async function fetchFeed(limit = 50): Promise<FeedSpot[]> {
-  // `profiles(username)` follows the user_id foreign key — like a JOIN in SQL.
+  // `author:profiles!spots_user_id_fkey(username)` is like a JOIN in SQL.
+  // The `!spots_user_id_fkey` part names WHICH link to follow: spots and profiles are
+  // also connected through the `likes` table, and without it Supabase can't choose.
+  // `spot_photos(image_path, position)` brings each spot's photo list along.
   const { data, error } = await supabase
     .from('spots')
-    .select('*, profiles(username)')
+    .select(
+      '*, author:profiles!spots_user_id_fkey(username), photos:spot_photos(image_path, position)',
+    )
     .order('created_at', { ascending: false })
     .limit(limit);
   if (error) throw error;
 
-  const rows = (data ?? []) as (Spot & { profiles: { username: string } | null })[];
+  type Row = Spot & {
+    author: { username: string } | null;
+    photos: { image_path: string; position: number }[];
+  };
+  const rows = (data ?? []) as Row[];
   if (rows.length === 0) return [];
+
+  // Photo paths per spot, in order. Spots without photo rows fall back to the cover.
+  const pathsBySpot = new Map(
+    rows.map((row) => [
+      row.id,
+      row.photos.length > 0
+        ? [...row.photos].sort((a, b) => a.position - b.position).map((p) => p.image_path)
+        : [row.image_path],
+    ]),
+  );
 
   // The bucket is private, so each photo needs a temporary signed link.
   // One request for all photos instead of one per photo.
+  const allPaths = [...pathsBySpot.values()].flat();
   const { data: signed, error: signError } = await supabase.storage
     .from(BUCKET)
-    .createSignedUrls(
-      rows.map((row) => row.image_path),
-      SIGNED_URL_SECONDS,
-    );
+    .createSignedUrls(allPaths, SIGNED_URL_SECONDS);
   if (signError) throw signError;
 
   const urlByPath = new Map(signed.map((item) => [item.path, item.signedUrl]));
 
-  return rows.map(({ profiles, ...spot }) => ({
+  return rows.map(({ author, photos: _photos, ...spot }) => ({
     ...spot,
-    username: profiles?.username ?? '?',
-    imageUrl: urlByPath.get(spot.image_path) ?? null,
+    username: author?.username ?? '?',
+    imageUrls: (pathsBySpot.get(spot.id) ?? [])
+      .map((path) => urlByPath.get(path))
+      .filter((url): url is string => Boolean(url)),
   }));
 }
 

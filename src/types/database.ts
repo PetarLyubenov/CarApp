@@ -53,6 +53,15 @@ export type Spot = {
   created_at: string;
 };
 
+/** One photo of a spot. `position` 0 is the cover photo. */
+export type SpotPhoto = {
+  id: string;
+  spot_id: string;
+  image_path: string;
+  position: number;
+  created_at: string;
+};
+
 export type Comment = {
   id: string;
   spot_id: string;

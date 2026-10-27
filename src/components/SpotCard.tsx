@@ -1,11 +1,11 @@
 /**
- * One spotted car in the feed: photo, car name, author, place and date.
+ * One spotted car in the feed: photos, car name, author, place and date.
  */
 import { StyleSheet, Text, View } from 'react-native';
-import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
+import { PhotoCarousel } from '@/components/PhotoCarousel';
 import { colors, spacing } from '@/constants/theme';
 import type { FeedSpot } from '@/services/spots';
 
@@ -27,13 +27,7 @@ export function SpotCard({ spot }: { spot: FeedSpot }) {
         )}
       </View>
 
-      {/* expo-image caches photos, so scrolling back up doesn't download them again */}
-      <Image
-        source={spot.imageUrl ? { uri: spot.imageUrl } : null}
-        style={styles.image}
-        contentFit="cover"
-        transition={200}
-      />
+      <PhotoCarousel urls={spot.imageUrls} />
 
       <View style={styles.body}>
         <Text style={styles.carName}>{carName}</Text>
@@ -64,7 +58,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   badgeText: { fontSize: 12, color: colors.textMuted },
-  image: { width: '100%', aspectRatio: 4 / 3, backgroundColor: colors.card },
   body: { paddingHorizontal: spacing.md, paddingTop: spacing.sm, gap: spacing.xs },
   carName: { fontSize: 17, fontWeight: '700', color: colors.text },
   description: { fontSize: 15, color: colors.text },

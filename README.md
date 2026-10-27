@@ -35,6 +35,7 @@ src/
   types/database.ts    # Types matching the database tables
 supabase/schema.sql    # Database tables + security rules
 supabase/storage.sql   # Photo storage bucket + rules
+supabase/spot_photos.sql # Several photos per spot
 ```
 
 ## Getting started
@@ -46,7 +47,7 @@ supabase/storage.sql   # Photo storage bucket + rules
 2. **Set up Supabase**
    - Create a project at [supabase.com](https://supabase.com).
    - Open **SQL Editor**, paste the content of `supabase/schema.sql` and run it.
-   - Then do the same with `supabase/storage.sql` (photo storage).
+   - Then do the same with `supabase/storage.sql` (photo storage) and `supabase/spot_photos.sql` (several photos per spot).
    - Copy `.env.example` to `.env.local` and fill in the URL and the publishable key from **Project Settings → API Keys**.
 3. **Run the app**
    ```bash
@@ -68,8 +69,8 @@ supabase/storage.sql   # Photo storage bucket + rules
 
 - [x] Project setup, navigation, authentication
 - [x] Database schema with row level security
-- [x] Upload spots (camera/gallery, make/model picker, strip GPS data)
-- [x] Feed of spots
+- [x] Upload spots (up to 10 photos, camera/gallery, make/model picker, strip GPS data)
+- [x] Feed of spots with swipeable photos
 - [ ] Likes and comments
 - [ ] Search by make/model
 - [ ] Garage: cars, specs, modifications
