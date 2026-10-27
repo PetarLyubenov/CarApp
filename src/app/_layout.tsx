@@ -45,6 +45,11 @@ function RootNavigator() {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Protected guard={isSignedIn}>
         <Stack.Screen name="(tabs)" />
+        {/* Opens on top of the tabs, with a back button */}
+        <Stack.Screen
+          name="spot/[id]"
+          options={{ headerShown: true, title: '', headerBackButtonDisplayMode: 'minimal', headerTintColor: colors.primary }}
+        />
       </Stack.Protected>
       <Stack.Protected guard={!isSignedIn}>
         <Stack.Screen name="(auth)" />

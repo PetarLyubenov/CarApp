@@ -25,6 +25,7 @@ src/
     _layout.tsx        # Root: auth check, decides auth vs. tabs
     (auth)/            # Sign in / sign up
     (tabs)/            # Feed, Search, Upload, Garage, Events
+    spot/[id].tsx      # Spot details (opened from search)
   components/          # Reusable UI (Button, TextField, ...)
   constants/theme.ts   # Colors and spacing
   context/             # App-wide state (AuthContext)
@@ -72,7 +73,7 @@ supabase/spot_photos.sql # Several photos per spot
 - [x] Upload spots (up to 10 photos, camera/gallery, make/model picker, strip GPS data)
 - [x] Feed of spots with swipeable photos
 - [ ] Likes and comments
-- [ ] Search by make/model
+- [x] Search by make, model and year, with spot detail screen
 - [ ] Garage: cars, specs, modifications
 - [ ] Friends and privacy (public / friends only)
 - [ ] Events list, details, "going / interested"

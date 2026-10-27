@@ -38,7 +38,14 @@ const en = {
     friendsOnly: 'Friends only',
   },
   search: {
-    description: 'Search spotted cars by make and model.',
+    placeholder: 'Search make, model or year…',
+    popularMakes: 'Browse by make',
+    noResults: 'No cars found for "{{query}}".',
+    results_one: '{{count}} result',
+    results_other: '{{count}} results',
+  },
+  spot: {
+    notFound: "This spot doesn't exist or isn't visible to you.",
   },
   upload: {
     title: 'New spot',
