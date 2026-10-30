@@ -124,6 +124,18 @@ const en = {
     cameraDenied: 'Camera access is needed to take a photo. You can allow it in Settings.',
     libraryDenied: 'Photo access is needed to choose a photo. You can allow it in Settings.',
   },
+  capture: {
+    title: 'Quick photo',
+    openCamera: 'Open camera',
+    spotted: 'Spotted car',
+    myCar: 'My car',
+    spottedHint: 'Share a car you saw on the street.',
+    myCarHint: 'Adds it to your garage. Just the basics — no specs needed.',
+    note: 'Note (optional)',
+    shareSpot: 'Share spot',
+    addToGarage: 'Add to garage',
+    carAdded: 'Car added to your garage!',
+  },
   picker: {
     search: 'Search...',
     useCustom: 'Use "{{value}}"',

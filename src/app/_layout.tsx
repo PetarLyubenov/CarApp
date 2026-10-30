@@ -89,6 +89,7 @@ function RootNavigator() {
         <Stack.Screen name="profile/[id]" options={{ ...pushedScreen, title: '' }} />
         <Stack.Screen name="profile/edit" options={{ ...pushedScreen, title: t('profile.editProfile') }} />
         <Stack.Screen name="friends" options={{ ...pushedScreen, title: t('friends.title') }} />
+        <Stack.Screen name="capture" options={{ ...pushedScreen, title: t('capture.title') }} />
         {/* A sheet that slides up over the car screen */}
         <Stack.Screen
           name="garage/[id]/add-mod"

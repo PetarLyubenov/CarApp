@@ -2,13 +2,14 @@
  * Bottom tab bar of the main app. Each <Tabs.Screen> matches a file in this folder
  * (index.tsx = Feed, search.tsx = Search, ...).
  */
-import { Pressable, StyleSheet } from 'react-native';
+import { Alert, Pressable, StyleSheet } from 'react-native';
 import { router, Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
 import { colors, spacing } from '@/constants/theme';
 import { useAuth } from '@/context/AuthContext';
+import { takePhoto } from '@/lib/camera';
 
 type IconName = keyof typeof Ionicons.glyphMap;
 // Helper that builds the icon for a tab: filled + red when selected, grey outline otherwise.
@@ -27,11 +28,31 @@ export default function TabsLayout() {
   const { session } = useAuth();
   const myId = session?.user.id ?? '';
 
+  // Camera button: shoot first, then fill in the short form on the next screen.
+  const openCamera = async () => {
+    const photo = await takePhoto();
+    if (photo === 'denied') Alert.alert(t('upload.cameraDenied'));
+    else if (photo) {
+      router.push({ pathname: '/capture', params: { uri: photo.uri, width: String(photo.width) } });
+    }
+  };
+
   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textMuted,
+        // Camera in the top-left corner of every tab.
+        headerLeft: () => (
+          <Pressable
+            onPress={openCamera}
+            hitSlop={8}
+            style={styles.cameraButton}
+            accessibilityLabel={t('capture.openCamera')}
+          >
+            <Ionicons name="camera-outline" size={28} color={colors.primary} />
+          </Pressable>
+        ),
         // Profile button in the top-right corner of every tab.
         headerRight: () => (
           <Pressable
@@ -73,5 +94,6 @@ export default function TabsLayout() {
 }
 
 const styles = StyleSheet.create({
+  cameraButton: { marginLeft: spacing.md },
   profileButton: { marginRight: spacing.md },
 });

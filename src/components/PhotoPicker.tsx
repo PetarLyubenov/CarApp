@@ -10,6 +10,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
 import { colors, spacing } from '@/constants/theme';
+import { takePhoto } from '@/lib/camera';
 import type { LocalPhoto } from '@/services/photos';
 
 type Props = {
@@ -28,32 +29,28 @@ export function PhotoPicker({ photos, onChange, max }: Props) {
       return;
     }
 
-    // Ask for permission first; the system shows its own dialog the first time.
-    const permission =
-      source === 'camera'
-        ? await ImagePicker.requestCameraPermissionsAsync()
-        : await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permission.granted) {
-      Alert.alert(t(source === 'camera' ? 'upload.cameraDenied' : 'upload.libraryDenied'));
+    if (source === 'camera') {
+      const photo = await takePhoto();
+      if (photo === 'denied') Alert.alert(t('upload.cameraDenied'));
+      else if (photo) onChange([...photos, photo]);
       return;
     }
 
-    const result =
-      source === 'camera'
-        ? await ImagePicker.launchCameraAsync({
-            mediaTypes: ['images'],
-            allowsEditing: true, // lets the user crop the shot
-            aspect: [4, 3],
-            quality: 1, // compressed later in the spots service
-          })
-        : await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ['images'],
-            // Cropping isn't available when picking several photos at once.
-            allowsMultipleSelection: true,
-            selectionLimit: remaining,
-            orderedSelection: true, // keep the order the user tapped them in
-            quality: 1,
-          });
+    // Ask for permission first; the system shows its own dialog the first time.
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) {
+      Alert.alert(t('upload.libraryDenied'));
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      // Cropping isn't available when picking several photos at once.
+      allowsMultipleSelection: true,
+      selectionLimit: remaining,
+      orderedSelection: true, // keep the order the user tapped them in
+      quality: 1,
+    });
 
     if (!result.canceled) {
       const picked = result.assets.map((asset) => ({ uri: asset.uri, width: asset.width }));

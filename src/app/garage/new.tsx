@@ -9,14 +9,13 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/Button';
 import { ChipSelect } from '@/components/ChipSelect';
 import { PhotoPicker } from '@/components/PhotoPicker';
-import { PickerModal } from '@/components/PickerModal';
-import { SelectField } from '@/components/SelectField';
+import { MakeModelFields, type MakeModel } from '@/components/MakeModelFields';
 import { TextField } from '@/components/TextField';
 import { VisibilityToggle } from '@/components/VisibilityToggle';
 import { colors, spacing } from '@/constants/theme';
 import { useAuth } from '@/context/AuthContext';
-import { CAR_MAKES, MAKE_NAMES } from '@/data/carMakes';
 import { getErrorMessage } from '@/lib/errors';
+import { parseYear } from '@/lib/format';
 import { createCar } from '@/services/garage';
 import { MAX_PHOTOS, type LocalPhoto } from '@/services/photos';
 import { fetchDefaultVisibility } from '@/services/profiles';
@@ -47,8 +46,7 @@ export default function NewCarScreen() {
 
   // ---- Form state ----
   const [photos, setPhotos] = useState<LocalPhoto[]>([]);
-  const [make, setMake] = useState<string | null>(null);
-  const [model, setModel] = useState<string | null>(null);
+  const [car, setCar] = useState<MakeModel>({ make: null, model: null });
   const [year, setYear] = useState('');
   const [nickname, setNickname] = useState('');
   const [engine, setEngine] = useState('');
@@ -61,7 +59,6 @@ export default function NewCarScreen() {
   const [visibility, setVisibility] = useState<Visibility>('public');
 
   // ---- UI state ----
-  const [openPicker, setOpenPicker] = useState<'make' | 'model' | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -73,16 +70,11 @@ export default function NewCarScreen() {
     if (!userId) return;
 
     // ---- Validation ----
+    const { make, model } = car;
     if (!make || !model) return setError(t('upload.needMakeModel'));
 
-    let yearNumber: number | null = null;
-    if (year.trim()) {
-      yearNumber = Number(year);
-      const maxYear = new Date().getFullYear() + 1;
-      if (!Number.isInteger(yearNumber) || yearNumber < 1886 || yearNumber > maxYear) {
-        return setError(t('upload.invalidYear'));
-      }
-    }
+    const yearNumber = parseYear(year);
+    if (yearNumber === 'invalid') return setError(t('upload.invalidYear'));
 
     let hp: number | null = null;
     if (horsepower.trim()) {
@@ -126,19 +118,7 @@ export default function NewCarScreen() {
         <PhotoPicker photos={photos} onChange={setPhotos} max={MAX_PHOTOS} />
 
         {/* ---- Car ---- */}
-        <SelectField
-          label={t('upload.make')}
-          value={make}
-          placeholder={t('upload.selectMake')}
-          onPress={() => setOpenPicker('make')}
-        />
-        <SelectField
-          label={t('upload.model')}
-          value={model}
-          placeholder={make ? t('upload.selectModel') : t('upload.selectMakeFirst')}
-          onPress={() => setOpenPicker('model')}
-          disabled={!make}
-        />
+        <MakeModelFields value={car} onChange={setCar} />
         <TextField label={t('upload.year')} value={year} onChangeText={setYear} keyboardType="number-pad" maxLength={4} />
         <TextField
           label={t('garage.nickname')}
@@ -199,30 +179,6 @@ export default function NewCarScreen() {
         <Button title={t('garage.saveCar')} onPress={handleSave} loading={saving} />
       </ScrollView>
 
-      {/* ---- Pickers (hidden until opened) ---- */}
-      <PickerModal
-        visible={openPicker === 'make'}
-        title={t('upload.selectMake')}
-        options={MAKE_NAMES}
-        allowCustom
-        onClose={() => setOpenPicker(null)}
-        onSelect={(value) => {
-          if (value !== make) setModel(null); // a new make invalidates the old model
-          setMake(value);
-          setOpenPicker(null);
-        }}
-      />
-      <PickerModal
-        visible={openPicker === 'model'}
-        title={t('upload.selectModel')}
-        options={make ? (CAR_MAKES[make] ?? []) : []}
-        allowCustom
-        onClose={() => setOpenPicker(null)}
-        onSelect={(value) => {
-          setModel(value);
-          setOpenPicker(null);
-        }}
-      />
     </KeyboardAvoidingView>
   );
 }

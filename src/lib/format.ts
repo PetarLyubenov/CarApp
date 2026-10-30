@@ -56,3 +56,14 @@ export function normalizeUrl(text: string): string | null {
   const withScheme = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
   return /^https?:\/\/[^\s/]+\.[^\s]+$/i.test(withScheme) ? withScheme : null;
 }
+
+/**
+ * Read an optional year typed by the user.
+ * Empty -> null (no year), a real car year -> the number, anything else -> 'invalid'.
+ */
+export function parseYear(text: string): number | null | 'invalid' {
+  if (!text.trim()) return null;
+  const year = Number(text);
+  const maxYear = new Date().getFullYear() + 1; // next year's models are already on sale
+  return Number.isInteger(year) && year >= 1886 && year <= maxYear ? year : 'invalid';
+}
