@@ -124,7 +124,9 @@ export default function CarScreen() {
           <View>
             {car.nickname && <Text style={styles.nickname}>{car.nickname}</Text>}
             <Text style={styles.name}>{name}</Text>
-            <Text style={styles.muted}>{t('garage.owner', { username: car.username })}</Text>
+            <Pressable onPress={() => router.push({ pathname: '/profile/[id]', params: { id: car.user_id } })}>
+              <Text style={styles.link}>{t('garage.owner', { username: car.username })}</Text>
+            </Pressable>
           </View>
 
           {car.description && <Text style={styles.description}>{car.description}</Text>}
@@ -216,6 +218,7 @@ const styles = StyleSheet.create({
   nickname: { fontSize: 14, fontWeight: '600', color: colors.primary },
   name: { fontSize: 24, fontWeight: '700', color: colors.text },
   muted: { fontSize: 14, color: colors.textMuted },
+  link: { fontSize: 14, color: colors.primary, fontWeight: '600' },
   description: { fontSize: 15, color: colors.text, lineHeight: 21 },
   card: { backgroundColor: colors.card, borderRadius: 16, padding: spacing.md, gap: spacing.sm },
   sectionTitle: { fontSize: 18, fontWeight: '700', color: colors.text },

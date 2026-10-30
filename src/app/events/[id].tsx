@@ -24,7 +24,7 @@ import { useAuth } from '@/context/AuthContext';
 import { getErrorMessage } from '@/lib/errors';
 import { formatDateTime, formatEuro } from '@/lib/format';
 import { deleteEvent, fetchEvent, setAttendance, type EventItem } from '@/services/events';
-import { fetchMyProfile } from '@/services/organizations';
+import { fetchProfile } from '@/services/profiles';
 import type { AttendanceStatus } from '@/types/database';
 
 /** Open the place in Apple Maps (iPhone) or Google Maps (Android). */
@@ -51,7 +51,7 @@ export default function EventScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      Promise.all([fetchEvent(id, userId), fetchMyProfile(userId)])
+      Promise.all([fetchEvent(id, userId), fetchProfile(userId)])
         .then(([result, profile]) => {
           setEvent(result);
           setIsAdmin(profile?.role === 'admin');
@@ -129,12 +129,15 @@ export default function EventScreen() {
               {t(`eventTypes.${event.event_type}`)} · {event.brand ?? t('events.allBrands')}
             </Text>
             <Text style={styles.title}>{event.title}</Text>
-            <View style={styles.row}>
-              <Text style={styles.muted}>{t('events.organizedBy', { name: organizerName })}</Text>
+            <Pressable
+              style={styles.row}
+              onPress={() => router.push({ pathname: '/profile/[id]', params: { id: event.created_by } })}
+            >
+              <Text style={styles.link}>{t('events.organizedBy', { name: organizerName })}</Text>
               {event.organizer?.is_verified && (
                 <Ionicons name="checkmark-circle" size={16} color={colors.primary} accessibilityLabel={t('events.verified')} />
               )}
-            </View>
+            </Pressable>
           </View>
 
           {/* ---- Going / Interested ---- */}
@@ -227,6 +230,7 @@ const styles = StyleSheet.create({
   title: { fontSize: 24, fontWeight: '700', color: colors.text },
   row: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   muted: { fontSize: 14, color: colors.textMuted },
+  link: { fontSize: 14, color: colors.primary, fontWeight: '600' },
   attendance: { flexDirection: 'row', gap: spacing.sm },
   attendButton: {
     flex: 1,

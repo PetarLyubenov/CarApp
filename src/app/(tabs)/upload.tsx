@@ -17,7 +17,8 @@ import { useAuth } from '@/context/AuthContext';
 import { CAR_MAKES, MAKE_NAMES } from '@/data/carMakes';
 import { getErrorMessage } from '@/lib/errors';
 import { MAX_PHOTOS, type LocalPhoto } from '@/services/photos';
-import { fetchDefaultVisibility, uploadSpot } from '@/services/spots';
+import { fetchDefaultVisibility } from '@/services/profiles';
+import { uploadSpot } from '@/services/spots';
 import type { Visibility } from '@/types/database';
 
 export default function UploadScreen() {

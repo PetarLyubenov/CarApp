@@ -2,11 +2,13 @@
  * Bottom tab bar of the main app. Each <Tabs.Screen> matches a file in this folder
  * (index.tsx = Feed, search.tsx = Search, ...).
  */
-import { Tabs } from 'expo-router';
+import { Pressable, StyleSheet } from 'react-native';
+import { router, Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
-import { colors } from '@/constants/theme';
+import { colors, spacing } from '@/constants/theme';
+import { useAuth } from '@/context/AuthContext';
 
 type IconName = keyof typeof Ionicons.glyphMap;
 // Helper that builds the icon for a tab: filled + red when selected, grey outline otherwise.
@@ -22,12 +24,25 @@ function tabIcon(active: IconName, inactive: IconName) {
 
 export default function TabsLayout() {
   const { t } = useTranslation();
+  const { session } = useAuth();
+  const myId = session?.user.id ?? '';
 
   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textMuted,
+        // Profile button in the top-right corner of every tab.
+        headerRight: () => (
+          <Pressable
+            onPress={() => router.push({ pathname: '/profile/[id]', params: { id: myId } })}
+            hitSlop={8}
+            style={styles.profileButton}
+            accessibilityLabel={t('profile.myProfile')}
+          >
+            <Ionicons name="person-circle-outline" size={28} color={colors.primary} />
+          </Pressable>
+        ),
       }}
     >
       <Tabs.Screen
@@ -56,3 +71,7 @@ export default function TabsLayout() {
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  profileButton: { marginRight: spacing.md },
+});

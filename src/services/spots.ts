@@ -118,15 +118,30 @@ async function toFeedSpots(rows: SpotRow[], { coverOnly = false } = {}): Promise
 /**
  * Newest spots the current user is allowed to see.
  * The database security rules already filter out other people's "friends only" spots.
+ * Pass `onlyUserIds` to show just those people's spots (the "Friends" feed).
  */
-export async function fetchFeed(limit = 50): Promise<FeedSpot[]> {
+export async function fetchFeed({
+  onlyUserIds,
+  limit = 50,
+}: { onlyUserIds?: string[]; limit?: number } = {}): Promise<FeedSpot[]> {
+  let query = supabase.from('spots').select(SPOT_COLUMNS);
+  if (onlyUserIds) query = query.in('user_id', onlyUserIds);
+
+  const { data, error } = await query.order('created_at', { ascending: false }).limit(limit);
+  if (error) throw error;
+  return toFeedSpots((data ?? []) as SpotRow[]);
+}
+
+/** One person's spots for their profile grid (only the ones you're allowed to see). */
+export async function fetchUserSpots(userId: string, limit = 60): Promise<FeedSpot[]> {
   const { data, error } = await supabase
     .from('spots')
     .select(SPOT_COLUMNS)
+    .eq('user_id', userId)
     .order('created_at', { ascending: false })
     .limit(limit);
   if (error) throw error;
-  return toFeedSpots((data ?? []) as SpotRow[]);
+  return toFeedSpots((data ?? []) as SpotRow[], { coverOnly: true });
 }
 
 /**
@@ -177,14 +192,4 @@ export async function fetchSpot(id: string): Promise<FeedSpot | null> {
   if (!data) return null;
   const [spot] = await toFeedSpots([data as SpotRow]);
   return spot;
-}
-
-/** The current user's default visibility, used to pre-select the upload form. */
-export async function fetchDefaultVisibility(userId: string): Promise<Visibility> {
-  const { data } = await supabase
-    .from('profiles')
-    .select('default_visibility')
-    .eq('id', userId)
-    .single();
-  return (data?.default_visibility as Visibility | undefined) ?? 'public';
 }

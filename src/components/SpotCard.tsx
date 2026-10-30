@@ -1,10 +1,12 @@
 /**
  * One spotted car in the feed: photos, car name, author, place and date.
  */
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
+import { Avatar } from '@/components/Avatar';
 import { PhotoCarousel } from '@/components/PhotoCarousel';
 import { colors, spacing } from '@/constants/theme';
 import type { FeedSpot } from '@/services/spots';
@@ -16,8 +18,12 @@ export function SpotCard({ spot }: { spot: FeedSpot }) {
 
   return (
     <View style={styles.card}>
-      <View style={styles.header}>
-        <Ionicons name="person-circle-outline" size={28} color={colors.textMuted} />
+      {/* Tapping the author opens their profile */}
+      <Pressable
+        style={styles.header}
+        onPress={() => router.push({ pathname: '/profile/[id]', params: { id: spot.user_id } })}
+      >
+        <Avatar name={spot.username} size={28} />
         <Text style={styles.username}>{spot.username}</Text>
         {spot.visibility === 'friends' && (
           <View style={styles.badge}>
@@ -25,7 +31,7 @@ export function SpotCard({ spot }: { spot: FeedSpot }) {
             <Text style={styles.badgeText}>{t('feed.friendsOnly')}</Text>
           </View>
         )}
-      </View>
+      </Pressable>
 
       <PhotoCarousel urls={spot.imageUrls} />
 

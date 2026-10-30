@@ -1,14 +1,8 @@
 /**
- * Profiles and organizer applications: who may create events, and how to become an organizer.
+ * Organizer applications: who may create events, and how to become an organizer.
  */
 import { supabase } from '@/lib/supabase';
 import type { OrganizationRequest, Profile } from '@/types/database';
-
-export async function fetchMyProfile(userId: string): Promise<Profile | null> {
-  const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).maybeSingle();
-  if (error) throw error;
-  return data as Profile | null;
-}
 
 /** Same rule as can_create_events() in the database. */
 export function canCreateEvents(profile: Profile | null): boolean {

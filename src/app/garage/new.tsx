@@ -19,7 +19,7 @@ import { CAR_MAKES, MAKE_NAMES } from '@/data/carMakes';
 import { getErrorMessage } from '@/lib/errors';
 import { createCar } from '@/services/garage';
 import { MAX_PHOTOS, type LocalPhoto } from '@/services/photos';
-import { fetchDefaultVisibility } from '@/services/spots';
+import { fetchDefaultVisibility } from '@/services/profiles';
 import type { FuelType, Visibility } from '@/types/database';
 
 // Stored in the database as these short codes; shown translated.

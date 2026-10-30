@@ -18,7 +18,8 @@ import { colors, spacing } from '@/constants/theme';
 import { useAuth } from '@/context/AuthContext';
 import { getErrorMessage } from '@/lib/errors';
 import { fetchUpcomingEvents, type EventItem } from '@/services/events';
-import { canCreateEvents, fetchMyLatestRequest, fetchMyProfile } from '@/services/organizations';
+import { canCreateEvents, fetchMyLatestRequest } from '@/services/organizations';
+import { fetchProfile } from '@/services/profiles';
 import type { EventType, OrganizationRequest, Profile } from '@/types/database';
 
 const EVENT_TYPES: EventType[] = ['show', 'meet', 'track_day', 'other'];
@@ -42,7 +43,7 @@ export default function EventsScreen() {
     useCallback(() => {
       if (!userId) return;
       // Load the three things at the same time instead of one after another.
-      Promise.all([fetchUpcomingEvents(userId), fetchMyProfile(userId), fetchMyLatestRequest(userId)])
+      Promise.all([fetchUpcomingEvents(userId), fetchProfile(userId), fetchMyLatestRequest(userId)])
         .then(([eventList, myProfile, myRequest]) => {
           setEvents(eventList);
           setProfile(myProfile);
