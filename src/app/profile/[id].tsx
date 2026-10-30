@@ -1,13 +1,14 @@
 /**
  * A person's profile: name, bio, friend button, and their spots and garage.
  *
- * On your OWN profile you get "Edit profile", "Friends" and "Sign out" instead of
+ * On your OWN profile you get "Edit profile", "Friends" and a sign-out icon instead of
  * the friend button. On other profiles you only see what the database lets you see:
  * public items, plus "friends only" items once you are friends.
  */
 import { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
   Pressable,
   StyleSheet,
@@ -80,6 +81,17 @@ export default function ProfileScreen() {
 
   // Reload when coming back from "Edit profile" or the friends screen.
   useFocusEffect(load);
+
+  const confirmSignOut = () => {
+    Alert.alert(t('common.signOut'), t('profile.signOutConfirm'), [
+      { text: t('spot.cancel'), style: 'cancel' },
+      {
+        text: t('common.signOut'),
+        style: 'destructive',
+        onPress: () => signOut().catch((e) => Alert.alert(getErrorMessage(e, t('common.error')))),
+      },
+    ]);
+  };
 
   if (loading) {
     return (
@@ -155,15 +167,21 @@ export default function ProfileScreen() {
     </View>
   );
 
-  const footer = isMe ? (
-    <View style={styles.footer}>
-      <Button title={t('common.signOut')} onPress={signOut} variant="secondary" />
-    </View>
-  ) : undefined;
-
   return (
     <>
-      <Stack.Screen options={{ title: isMe ? t('profile.myProfile') : `@${profile.username}` }} />
+      <Stack.Screen
+        options={{
+          title: isMe ? t('profile.myProfile') : `@${profile.username}`,
+          // Sign out sits in the top-right corner, so it's easy to find however many spots you have.
+          headerRight: isMe
+            ? () => (
+                <Pressable onPress={confirmSignOut} hitSlop={8} accessibilityLabel={t('common.signOut')}>
+                  <Ionicons name="log-out-outline" size={26} color={colors.primary} />
+                </Pressable>
+              )
+            : undefined,
+        }}
+      />
       {tab === 'spots' ? (
         // `key` makes React build a fresh list when switching tabs (numColumns can't change in place).
         <FlatList
@@ -177,7 +195,6 @@ export default function ProfileScreen() {
           renderItem={({ item }) => <SpotGridItem spot={item} size={tileSize} />}
           ListHeaderComponent={header}
           ListEmptyComponent={<Text style={styles.empty}>{t('profile.noSpots')}</Text>}
-          ListFooterComponent={footer}
         />
       ) : (
         <FlatList
@@ -193,7 +210,6 @@ export default function ProfileScreen() {
           )}
           ListHeaderComponent={header}
           ListEmptyComponent={<Text style={styles.empty}>{t('profile.noCars')}</Text>}
-          ListFooterComponent={footer}
         />
       )}
     </>
@@ -228,5 +244,4 @@ const styles = StyleSheet.create({
   carList: { paddingBottom: spacing.md },
   carItem: { paddingHorizontal: spacing.md, paddingBottom: spacing.md },
   empty: { color: colors.textMuted, textAlign: 'center', padding: spacing.lg },
-  footer: { padding: spacing.md },
 });

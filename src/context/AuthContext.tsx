@@ -40,7 +40,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    // Supabase returns errors instead of throwing them. Throw it, so the screen can
+    // show what went wrong instead of the button silently doing nothing.
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
   };
 
   return (

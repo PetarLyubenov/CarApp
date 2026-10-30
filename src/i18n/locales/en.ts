@@ -58,6 +58,7 @@ const en = {
     bio: 'Bio (optional)',
     defaultVisibility: 'Default for new spots and cars',
     save: 'Save',
+    signOutConfirm: 'Do you want to sign out?',
   },
   friends: {
     title: 'Friends',
