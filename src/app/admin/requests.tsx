@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/Button';
 import { colors, spacing } from '@/constants/theme';
 import { getErrorMessage } from '@/lib/errors';
+import { formatDate } from '@/lib/format';
 import { fetchPendingRequests, reviewRequest, type PendingRequest } from '@/services/organizations';
 
 export default function RequestsScreen() {
@@ -67,7 +68,7 @@ export default function RequestsScreen() {
           <Text style={styles.name}>{item.org_name}</Text>
           <Text style={styles.muted}>
             {t('organizer.from', { username: item.applicant?.username ?? '?' })} ·{' '}
-            {new Date(item.created_at).toLocaleDateString()}
+            {formatDate(item.created_at)}
           </Text>
           {item.website && (
             <Text style={styles.link} onPress={() => Linking.openURL(item.website!)}>

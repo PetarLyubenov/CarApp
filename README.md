@@ -15,7 +15,7 @@ A mobile app for car enthusiasts (iOS and Android):
 | App | [Expo](https://expo.dev) (React Native) + TypeScript |
 | Navigation | Expo Router (file-based, `src/app/`) |
 | Backend | [Supabase](https://supabase.com): Postgres, Auth, Storage |
-| Translations | i18next (English now, Bulgarian planned) |
+| Translations | i18next (English and Bulgarian) |
 
 ## Project structure
 
@@ -87,7 +87,7 @@ supabase/friends.sql   # One friendship per pair, safer updates
 - [x] Events list, details, "going / interested"
 - [x] Organization verification flow (apply in the app, admin approves)
 - [ ] Notifications
-- [ ] Bulgarian translation
+- [x] Bulgarian translation (flag switcher on sign-in and on your profile)
 - [ ] Publish to App Store and Google Play
 
 ## Scripts

@@ -13,7 +13,7 @@ import { PhotoCarousel } from '@/components/PhotoCarousel';
 import { colors, spacing } from '@/constants/theme';
 import { useAuth } from '@/context/AuthContext';
 import { getErrorMessage } from '@/lib/errors';
-import { formatEuro } from '@/lib/format';
+import { formatDate, formatEuro } from '@/lib/format';
 import { deleteCar, deleteModification, fetchCar, type CarDetails } from '@/services/garage';
 import type { Modification } from '@/types/database';
 
@@ -179,7 +179,7 @@ export default function CarScreen() {
 function ModRow({ mod, onDelete }: { mod: Modification; onDelete?: () => void }) {
   const { t } = useTranslation();
   const meta = [
-    mod.installed_on ? new Date(mod.installed_on).toLocaleDateString() : null,
+    mod.installed_on ? formatDate(mod.installed_on) : null,
     mod.cost != null ? formatEuro(Number(mod.cost)) : null,
   ]
     .filter(Boolean)

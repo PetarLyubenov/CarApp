@@ -12,6 +12,7 @@ import { PhotoCarousel } from '@/components/PhotoCarousel';
 import { colors, spacing } from '@/constants/theme';
 import { useAuth } from '@/context/AuthContext';
 import { getErrorMessage } from '@/lib/errors';
+import { formatDate } from '@/lib/format';
 import { setSpotLiked } from '@/services/social';
 import type { FeedSpot } from '@/services/spots';
 
@@ -53,7 +54,7 @@ export function SpotCard({ spot, onCommentPress }: Props) {
     onCommentPress ?? (() => router.push({ pathname: '/spot/[id]', params: { id: spot.id } }));
 
   const carName = [spot.year, spot.make, spot.model].filter(Boolean).join(' ');
-  const date = new Date(spot.created_at).toLocaleDateString();
+  const date = formatDate(spot.created_at);
 
   return (
     <View style={styles.card}>

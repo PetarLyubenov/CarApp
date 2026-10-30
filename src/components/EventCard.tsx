@@ -8,7 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
 import { colors, spacing } from '@/constants/theme';
-import { formatDateTime, formatEuro } from '@/lib/format';
+import { formatDateTime, formatEuro, formatMonth } from '@/lib/format';
 import type { EventItem } from '@/services/events';
 
 export function EventCard({ event }: { event: EventItem }) {
@@ -28,7 +28,7 @@ export function EventCard({ event }: { event: EventItem }) {
       <View style={styles.body}>
         {/* Calendar-style date badge */}
         <View style={styles.dateBadge}>
-          <Text style={styles.month}>{start.toLocaleDateString(undefined, { month: 'short' }).toUpperCase()}</Text>
+          <Text style={styles.month}>{formatMonth(event.starts_at)}</Text>
           <Text style={styles.day}>{start.getDate()}</Text>
         </View>
 

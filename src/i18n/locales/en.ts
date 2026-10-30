@@ -1,7 +1,6 @@
 /**
  * English texts. Every text the user sees should live here, never hard-coded in a screen.
- * To add Bulgarian later: copy this file to `bg.ts`, translate the values,
- * and register it in `src/i18n/index.ts`.
+ * When you add a text here, add it to `bg.ts` too (TypeScript will remind you).
  */
 const en = {
   common: {
@@ -294,6 +293,12 @@ const en = {
     reject: 'Reject',
     approved: 'Approved — {{name}} can now post events.',
     rejected: 'Application rejected.',
+  },
+  language: {
+    label: 'Language',
+    // Each language's name is written in that language, so people can always find theirs.
+    bg: 'Български',
+    en: 'English',
   },
 };
 

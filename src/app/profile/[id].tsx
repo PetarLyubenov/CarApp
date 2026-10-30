@@ -24,6 +24,7 @@ import { Avatar } from '@/components/Avatar';
 import { Button } from '@/components/Button';
 import { CarCard } from '@/components/CarCard';
 import { FriendButton } from '@/components/FriendButton';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { SpotGridItem } from '@/components/SpotGridItem';
 import { colors, spacing } from '@/constants/theme';
 import { useAuth } from '@/context/AuthContext';
@@ -137,17 +138,24 @@ export default function ProfileScreen() {
 
       {/* ---- Actions ---- */}
       {isMe ? (
-        <View style={styles.actions}>
-          <View style={styles.flex}>
-            <Button title={t('profile.editProfile')} onPress={() => router.push('/profile/edit')} variant="secondary" />
+        <>
+          <View style={styles.actions}>
+            <View style={styles.flex}>
+              <Button title={t('profile.editProfile')} onPress={() => router.push('/profile/edit')} variant="secondary" />
+            </View>
+            <View style={styles.flex}>
+              <Button
+                title={newRequests > 0 ? t('profile.friendsWithRequests', { count: newRequests }) : t('profile.friends')}
+                onPress={() => router.push('/friends')}
+              />
+            </View>
           </View>
-          <View style={styles.flex}>
-            <Button
-              title={newRequests > 0 ? t('profile.friendsWithRequests', { count: newRequests }) : t('profile.friends')}
-              onPress={() => router.push('/friends')}
-            />
+          {/* App language — only on your own profile */}
+          <View style={styles.languageRow}>
+            <Text style={styles.languageLabel}>{t('language.label')}</Text>
+            <LanguageSwitcher />
           </View>
-        </View>
+        </>
       ) : (
         <FriendButton me={me} them={id} username={profile.username} status={status} onChange={load} />
       )}
@@ -234,6 +242,8 @@ const styles = StyleSheet.create({
   badgeText: { fontSize: 13, fontWeight: '600', color: colors.primary },
   bio: { fontSize: 15, color: colors.text, lineHeight: 21 },
   actions: { flexDirection: 'row', gap: spacing.sm },
+  languageRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  languageLabel: { fontSize: 15, fontWeight: '600', color: colors.text },
   flex: { flex: 1 },
   tabs: { flexDirection: 'row', backgroundColor: colors.card, borderRadius: 12, padding: 4 },
   tab: { flex: 1, paddingVertical: 10, borderRadius: 9, alignItems: 'center' },

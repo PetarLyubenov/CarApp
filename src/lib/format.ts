@@ -1,18 +1,30 @@
 /**
  * Formatting and parsing helpers for prices, dates and links.
+ * Dates are written in the app's language (picked with the flags), not the phone's.
  */
+import i18n from '@/i18n';
 
 /** "450" or "450.50" with a € sign. */
 export function formatEuro(amount: number): string {
   return `€${Number.isInteger(amount) ? amount : amount.toFixed(2)}`;
 }
 
-/** e.g. "Sat, 17 May · 10:00" in the phone's language and time zone. */
+/** e.g. "17/05/2026" (English) or "17.05.2026 г." (Bulgarian), in the phone's time zone. */
+export function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString(i18n.language);
+}
+
+/** e.g. "Sat, 17 May · 10:00" in the app's language and the phone's time zone. */
 export function formatDateTime(iso: string): string {
   const date = new Date(iso);
-  const day = date.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' });
-  const time = date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+  const day = date.toLocaleDateString(i18n.language, { weekday: 'short', day: 'numeric', month: 'short' });
+  const time = date.toLocaleTimeString(i18n.language, { hour: '2-digit', minute: '2-digit' });
   return `${day} · ${time}`;
+}
+
+/** Short month name for calendar badges, e.g. "MAY" / "МАЙ". */
+export function formatMonth(iso: string): string {
+  return new Date(iso).toLocaleDateString(i18n.language, { month: 'short' }).toUpperCase();
 }
 
 /**

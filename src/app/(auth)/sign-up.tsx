@@ -5,9 +5,11 @@
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, StyleSheet, Text, View } from 'react-native';
 import { Link } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/Button';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { TextField } from '@/components/TextField';
 import { colors, spacing } from '@/constants/theme';
 import { supabase } from '@/lib/supabase';
@@ -17,6 +19,7 @@ const USERNAME_PATTERN = /^[a-zA-Z0-9_]{3,30}$/;
 
 export default function SignUpScreen() {
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
 
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -68,6 +71,10 @@ export default function SignUpScreen() {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
+      {/* Language flags in the top-right corner, below the status bar */}
+      <View style={[styles.language, { top: insets.top + spacing.sm }]}>
+        <LanguageSwitcher />
+      </View>
       <View style={styles.form}>
         <Text style={styles.title}>{t('auth.signUpTitle')}</Text>
 
@@ -102,6 +109,7 @@ export default function SignUpScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center', backgroundColor: colors.background },
+  language: { position: 'absolute', right: spacing.lg, zIndex: 1 },
   form: { padding: spacing.lg, gap: spacing.md },
   title: { fontSize: 28, fontWeight: '700', color: colors.text, marginBottom: spacing.sm },
   error: { color: colors.error },
