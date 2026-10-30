@@ -80,7 +80,7 @@ supabase/friends.sql   # One friendship per pair, safer updates
 - [x] Database schema with row level security
 - [x] Upload spots (up to 10 photos, camera/gallery, make/model picker, strip GPS data)
 - [x] Feed of spots with swipeable photos
-- [ ] Likes and comments
+- [x] Likes and comments
 - [x] Search by make, model, city and year, with spot detail screen
 - [x] Garage: cars, specs, modifications with dates and costs
 - [x] Friends and privacy (public / friends only), profiles, Everyone / Friends feed

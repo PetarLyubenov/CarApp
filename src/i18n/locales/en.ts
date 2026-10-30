@@ -84,6 +84,18 @@ const en = {
   },
   spot: {
     notFound: "This spot doesn't exist or isn't visible to you.",
+    like: 'Like',
+    unlike: 'Unlike',
+    likes_one: '{{count}} like',
+    likes_other: '{{count}} likes',
+    comments: 'Comments',
+    noComments: 'No comments yet. Say something nice!',
+    commentPlaceholder: 'Add a comment…',
+    send: 'Send',
+    deleteComment: 'Delete comment',
+    deleteCommentConfirm: 'Delete this comment?',
+    delete: 'Delete',
+    cancel: 'Cancel',
   },
   upload: {
     title: 'New spot',

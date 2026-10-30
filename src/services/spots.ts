@@ -33,6 +33,9 @@ export type FeedSpot = Spot & {
   username: string;
   /** Signed links to all photos, cover first. */
   imageUrls: string[];
+  likeCount: number;
+  likedByMe: boolean;
+  commentCount: number;
 };
 
 /**
@@ -82,12 +85,15 @@ export async function uploadSpot(spot: NewSpot): Promise<void> {
 // The `!spots_user_id_fkey` part names WHICH link to follow: spots and profiles are
 // also connected through the `likes` table, and without it Supabase can't choose.
 // `photos:spot_photos(image_path, position)` brings each spot's photo list along.
+// `likes(user_id)` lists who liked it (count + "did I like it?"); `comments(count)` only counts.
 const SPOT_COLUMNS =
-  '*, author:profiles!spots_user_id_fkey(username), photos:spot_photos(image_path, position)';
+  '*, author:profiles!spots_user_id_fkey(username), photos:spot_photos(image_path, position), likes(user_id), comments(count)';
 
 type SpotRow = Spot & {
   author: { username: string } | null;
   photos: { image_path: string; position: number }[];
+  likes: { user_id: string }[];
+  comments: { count: number }[];
 };
 
 /**
@@ -105,10 +111,16 @@ async function toFeedSpots(rows: SpotRow[], { coverOnly = false } = {}): Promise
     }),
   );
   const urlByPath = await signPhotoUrls(BUCKET, [...pathsBySpot.values()].flat());
+  // The signed-in user's id, read from the saved session (no network request).
+  const { data: auth } = await supabase.auth.getSession();
+  const myId = auth.session?.user.id;
 
-  return rows.map(({ author, photos: _photos, ...spot }) => ({
+  return rows.map(({ author, photos: _photos, likes, comments, ...spot }) => ({
     ...spot,
     username: author?.username ?? '?',
+    likeCount: likes.length,
+    likedByMe: likes.some((like) => like.user_id === myId),
+    commentCount: comments[0]?.count ?? 0,
     imageUrls: (pathsBySpot.get(spot.id) ?? [])
       .map((path) => urlByPath.get(path))
       .filter((url): url is string => Boolean(url)),
