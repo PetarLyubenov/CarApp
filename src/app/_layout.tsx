@@ -20,6 +20,10 @@ import { colors } from '@/constants/theme';
 /** Header settings shared by screens that open on top of the tabs. */
 const pushedScreen = {
   headerShown: true,
+  // On iOS 26 the header is see-through by default and the screen slides under it,
+  // which hid the top of our screens (e.g. the friends search box). A solid header
+  // keeps every screen starting below it, the same as on Android.
+  headerTransparent: false,
   headerBackButtonDisplayMode: 'minimal',
   headerTintColor: colors.primary,
 } as const;
