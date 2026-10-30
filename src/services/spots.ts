@@ -36,6 +36,8 @@ export type FeedSpot = Spot & {
   likeCount: number;
   likedByMe: boolean;
   commentCount: number;
+  /** Exotic make or a model hardly anyone has spotted (rule in supabase/badges.sql). */
+  isRare: boolean;
 };
 
 /**
@@ -86,14 +88,16 @@ export async function uploadSpot(spot: NewSpot): Promise<void> {
 // also connected through the `likes` table, and without it Supabase can't choose.
 // `photos:spot_photos(image_path, position)` brings each spot's photo list along.
 // `likes(user_id)` lists who liked it (count + "did I like it?"); `comments(count)` only counts.
+// `is_rare` is a database function that behaves like an extra column.
 const SPOT_COLUMNS =
-  '*, author:profiles!spots_user_id_fkey(username), photos:spot_photos(image_path, position), likes(user_id), comments(count)';
+  '*, author:profiles!spots_user_id_fkey(username), photos:spot_photos(image_path, position), likes(user_id), comments(count), is_rare';
 
 type SpotRow = Spot & {
   author: { username: string } | null;
   photos: { image_path: string; position: number }[];
   likes: { user_id: string }[];
   comments: { count: number }[];
+  is_rare: boolean;
 };
 
 /**
@@ -115,12 +119,13 @@ async function toFeedSpots(rows: SpotRow[], { coverOnly = false } = {}): Promise
   const { data: auth } = await supabase.auth.getSession();
   const myId = auth.session?.user.id;
 
-  return rows.map(({ author, photos: _photos, likes, comments, ...spot }) => ({
+  return rows.map(({ author, photos: _photos, likes, comments, is_rare, ...spot }) => ({
     ...spot,
     username: author?.username ?? '?',
     likeCount: likes.length,
     likedByMe: likes.some((like) => like.user_id === myId),
     commentCount: comments[0]?.count ?? 0,
+    isRare: is_rare,
     imageUrls: (pathsBySpot.get(spot.id) ?? [])
       .map((path) => urlByPath.get(path))
       .filter((url): url is string => Boolean(url)),

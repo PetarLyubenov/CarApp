@@ -44,6 +44,7 @@ supabase/garage.sql    # Garage photo storage + rules
 supabase/fuel_type.sql # Fuel type column for garage cars
 supabase/events.sql    # Event covers + organizer applications
 supabase/friends.sql   # One friendship per pair, safer updates
+supabase/badges.sql    # Rare cars, badge numbers, rare-car ranking
 ```
 
 ## Getting started
@@ -55,7 +56,7 @@ supabase/friends.sql   # One friendship per pair, safer updates
 2. **Set up Supabase**
    - Create a project at [supabase.com](https://supabase.com).
    - Open **SQL Editor**, paste the content of `supabase/schema.sql` and run it.
-   - Then do the same with `supabase/storage.sql` (photo storage) `supabase/spot_photos.sql` (several photos per spot), `supabase/garage.sql` (garage photos), `supabase/fuel_type.sql` (fuel type for cars) `supabase/events.sql` (events and organizer applications) and `supabase/friends.sql` (friends).
+   - Then do the same with `supabase/storage.sql` (photo storage) `supabase/spot_photos.sql` (several photos per spot), `supabase/garage.sql` (garage photos), `supabase/fuel_type.sql` (fuel type for cars) `supabase/events.sql` (events and organizer applications) `supabase/friends.sql` (friends) and `supabase/badges.sql` (rare cars and badges).
    - Copy `.env.example` to `.env.local` and fill in the URL and the publishable key from **Project Settings → API Keys**.
 3. **Run the app**
    ```bash
@@ -86,6 +87,9 @@ supabase/friends.sql   # One friendship per pair, safer updates
 - [x] Friends and privacy (public / friends only), profiles, Everyone / Friends feed
 - [x] Events list, details, "going / interested"
 - [x] Organization verification flow (apply in the app, admin approves)
+- [x] Dark purple theme
+- [x] Quick camera for spotted cars and your own cars
+- [x] Rare cars, badges and a rare-car ranking
 - [ ] Notifications
 - [x] Bulgarian translation (flag switcher on sign-in and on your profile)
 - [ ] Publish to App Store and Google Play

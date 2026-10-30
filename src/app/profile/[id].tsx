@@ -21,6 +21,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
 import { Avatar } from '@/components/Avatar';
+import { BadgeIcon } from '@/components/BadgeIcon';
 import { Button } from '@/components/Button';
 import { CarCard } from '@/components/CarCard';
 import { FriendButton } from '@/components/FriendButton';
@@ -28,8 +29,10 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { SpotGridItem } from '@/components/SpotGridItem';
 import { colors, spacing } from '@/constants/theme';
 import { useAuth } from '@/context/AuthContext';
+import { BADGES, earnedBadges } from '@/data/badges';
 import { getErrorMessage } from '@/lib/errors';
 import { fetchFriendLists, fetchFriendStatus, type FriendStatus } from '@/services/friends';
+import { fetchUserStats, type UserStats } from '@/services/badges';
 import { fetchCars, type CarSummary } from '@/services/garage';
 import { fetchProfile } from '@/services/profiles';
 import { fetchUserSpots, type FeedSpot } from '@/services/spots';
@@ -53,6 +56,7 @@ export default function ProfileScreen() {
   const [spots, setSpots] = useState<FeedSpot[]>([]);
   const [cars, setCars] = useState<CarSummary[]>([]);
   const [newRequests, setNewRequests] = useState(0);
+  const [stats, setStats] = useState<UserStats | null>(null);
   const [tab, setTab] = useState<Tab>('spots');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -67,13 +71,15 @@ export default function ProfileScreen() {
       fetchCars(id),
       // Only your own profile shows how many requests are waiting.
       isMe ? fetchFriendLists(me).then((lists) => lists.incoming.length) : Promise.resolve(0),
+      fetchUserStats(id),
     ])
-      .then(([profileResult, statusResult, spotsResult, carsResult, requestCount]) => {
+      .then(([profileResult, statusResult, spotsResult, carsResult, requestCount, statsResult]) => {
         setProfile(profileResult);
         setStatus(statusResult);
         setSpots(spotsResult);
         setCars(carsResult);
         setNewRequests(requestCount);
+        setStats(statsResult);
         setError(null);
       })
       .catch((e) => setError(getErrorMessage(e, t('common.error'))))
@@ -158,6 +164,30 @@ export default function ProfileScreen() {
         </>
       ) : (
         <FriendButton me={me} them={id} username={profile.username} status={status} onChange={load} />
+      )}
+
+      {/* ---- Badges: earned ones, tap for all badges and the ranking ---- */}
+      {stats && (
+        <Pressable
+          style={styles.badges}
+          onPress={() => router.push({ pathname: '/badges/[id]', params: { id } })}
+        >
+          <View style={styles.badgesHeader}>
+            <Ionicons name="trophy" size={18} color={colors.gold} />
+            <Text style={styles.badgesTitle}>
+              {t('badges.earned', { earned: earnedBadges(stats).length, total: BADGES.length })}
+            </Text>
+            <Text style={styles.seeAll}>{t('badges.seeAll')}</Text>
+            <Ionicons name="chevron-forward" size={16} color={colors.primary} />
+          </View>
+          {earnedBadges(stats).length > 0 && (
+            <View style={styles.badgeIcons}>
+              {earnedBadges(stats).map((badge) => (
+                <BadgeIcon key={badge.id} badge={badge} earned size={36} />
+              ))}
+            </View>
+          )}
+        </Pressable>
       )}
 
       {/* ---- Spots / Garage switch ---- */}
@@ -251,6 +281,11 @@ const styles = StyleSheet.create({
   tabText: { color: colors.textMuted, fontWeight: '500' },
   tabTextActive: { color: '#fff', fontWeight: '600' },
   hint: { fontSize: 13, color: colors.textMuted, textAlign: 'center' },
+  badges: { gap: spacing.sm, padding: spacing.md, borderRadius: 14, backgroundColor: colors.card },
+  badgesHeader: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  badgesTitle: { flex: 1, fontSize: 15, fontWeight: '600', color: colors.text },
+  seeAll: { fontSize: 14, color: colors.primary },
+  badgeIcons: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   carList: { paddingBottom: spacing.md },
   carItem: { paddingHorizontal: spacing.md, paddingBottom: spacing.md },
   empty: { color: colors.textMuted, textAlign: 'center', padding: spacing.lg },

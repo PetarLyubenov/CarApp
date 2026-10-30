@@ -4,6 +4,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 
 import { colors } from '@/constants/theme';
 import type { FeedSpot } from '@/services/spots';
@@ -22,6 +23,12 @@ export function SpotGridItem({ spot, size }: Props) {
         contentFit="cover"
         transition={150}
       />
+      {/* Gold diamond in the corner for rare cars */}
+      {spot.isRare && (
+        <View style={styles.rare}>
+          <Ionicons name="diamond" size={12} color={colors.gold} />
+        </View>
+      )}
       {/* Dark strip with the car name, readable on any photo */}
       <View style={styles.label}>
         <Text style={styles.labelText} numberOfLines={1}>
@@ -44,4 +51,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.5)',
   },
   labelText: { color: '#fff', fontSize: 11, fontWeight: '600' },
+  rare: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    padding: 4,
+    borderRadius: 10,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+  },
 });

@@ -97,10 +97,24 @@ export function SpotCard({ spot, onCommentPress }: Props) {
       </View>
 
       <View style={styles.body}>
-        <Text style={styles.carName}>{carName}</Text>
+        <View style={styles.titleRow}>
+          <Text style={styles.carName}>{carName}</Text>
+          {spot.isRare && <RareTag />}
+        </View>
         {spot.description && <Text style={styles.description}>{spot.description}</Text>}
         <Text style={styles.meta}>{[spot.city, date].filter(Boolean).join(' · ')}</Text>
       </View>
+    </View>
+  );
+}
+
+/** Gold "◆ Rare" label for exotic and hardly-ever-spotted cars. */
+export function RareTag() {
+  const { t } = useTranslation();
+  return (
+    <View style={styles.rareTag}>
+      <Ionicons name="diamond" size={12} color={colors.gold} />
+      <Text style={styles.rareText}>{t('badges.rare')}</Text>
     </View>
   );
 }
@@ -135,7 +149,19 @@ const styles = StyleSheet.create({
   action: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   actionCount: { fontSize: 15, fontWeight: '600', color: colors.text },
   body: { paddingHorizontal: spacing.md, paddingTop: spacing.xs, gap: spacing.xs },
+  titleRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: spacing.sm },
   carName: { fontSize: 17, fontWeight: '700', color: colors.text },
+  rareTag: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: colors.gold,
+  },
+  rareText: { fontSize: 12, fontWeight: '700', color: colors.gold },
   description: { fontSize: 15, color: colors.text },
   meta: { fontSize: 13, color: colors.textMuted },
 });
