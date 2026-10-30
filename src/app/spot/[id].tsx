@@ -162,6 +162,7 @@ export default function SpotScreen() {
         {/* ---- New comment ---- */}
         <View style={[styles.inputBar, { paddingBottom: Math.max(insets.bottom, spacing.sm) }]}>
           <TextInput
+            keyboardAppearance="dark"
             ref={inputRef}
             style={styles.input}
             value={text}

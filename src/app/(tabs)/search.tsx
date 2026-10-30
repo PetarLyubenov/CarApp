@@ -79,6 +79,7 @@ export default function SearchScreen() {
       <View style={styles.searchBox}>
         <Ionicons name="search" size={18} color={colors.textMuted} />
         <TextInput
+          keyboardAppearance="dark"
           style={styles.input}
           value={query}
           onChangeText={setQuery}

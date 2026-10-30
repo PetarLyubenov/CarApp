@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   primary: { backgroundColor: colors.primary },
-  secondary: { backgroundColor: 'transparent' },
+  secondary: { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.primary },
   dimmed: { opacity: 0.7 },
   text: { color: '#fff', fontSize: 16, fontWeight: '600' },
   secondaryText: { color: colors.primary },

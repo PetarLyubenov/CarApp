@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     marginVertical: spacing.sm,
   },
   tab: { flex: 1, paddingVertical: 8, borderRadius: 9, alignItems: 'center' },
-  tabActive: { backgroundColor: colors.background },
+  tabActive: { backgroundColor: colors.primary },
   tabText: { color: colors.textMuted, fontWeight: '500' },
-  tabTextActive: { color: colors.text, fontWeight: '600' },
+  tabTextActive: { color: '#fff', fontWeight: '600' },
 });

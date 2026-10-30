@@ -4,7 +4,7 @@
  */
 import { StyleSheet, Text, View } from 'react-native';
 
-const COLORS = ['#E63946', '#457B9D', '#2A9D8F', '#E9C46A', '#F4A261', '#6D597A', '#1D3557'];
+const COLORS = ['#A855F7', '#7C3AED', '#EC4899', '#06B6D4', '#10B981', '#F59E0B', '#6366F1'];
 
 export function Avatar({ name, size = 40 }: { name: string; size?: number }) {
   // Simple hash: add up the character codes, then pick a color.

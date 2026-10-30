@@ -10,12 +10,29 @@
  */
 import '@/i18n'; // initialize translations before any screen renders
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
-import { Stack } from 'expo-router';
+import { DarkTheme, Stack, ThemeProvider, type Theme } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { colors } from '@/constants/theme';
+
+/**
+ * Colors for the navigation parts (headers, tab bar, screen backgrounds behind animations).
+ * Starts from the built-in dark theme and swaps in our purple palette.
+ */
+const navigationTheme: Theme = {
+  ...DarkTheme,
+  colors: {
+    ...DarkTheme.colors,
+    primary: colors.primary,
+    background: colors.background,
+    card: colors.surface,
+    text: colors.text,
+    border: colors.border,
+    notification: colors.primary,
+  },
+};
 
 /** Header settings shared by screens that open on top of the tabs. */
 const pushedScreen = {
@@ -31,8 +48,11 @@ const pushedScreen = {
 export default function RootLayout() {
   return (
     <AuthProvider>
-      <RootNavigator />
-      <StatusBar style="dark" />
+      <ThemeProvider value={navigationTheme}>
+        <RootNavigator />
+      </ThemeProvider>
+      {/* Light (white) clock and battery icons on our dark background */}
+      <StatusBar style="light" />
     </AuthProvider>
   );
 }

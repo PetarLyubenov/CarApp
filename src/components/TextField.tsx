@@ -17,6 +17,7 @@ export function TextField({ label, style, ...inputProps }: Props) {
         placeholderTextColor={colors.textMuted}
         autoCapitalize="none"
         autoCorrect={false}
+        keyboardAppearance="dark"
         {...inputProps}
       />
     </View>
@@ -34,6 +35,6 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     fontSize: 16,
     color: colors.text,
-    backgroundColor: colors.background,
+    backgroundColor: colors.card,
   },
 });

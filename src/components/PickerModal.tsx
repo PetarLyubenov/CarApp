@@ -53,6 +53,8 @@ export function PickerModal({ visible, title, options, allowCustom = false, onSe
         </View>
 
         <TextInput
+
+          keyboardAppearance="dark"
           style={styles.search}
           value={query}
           onChangeText={setQuery}

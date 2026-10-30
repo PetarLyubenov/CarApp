@@ -38,13 +38,9 @@ const styles = StyleSheet.create({
   segment: { flexDirection: 'row', backgroundColor: colors.card, borderRadius: 12, padding: 4 },
   item: { flex: 1, paddingVertical: 10, borderRadius: 9, alignItems: 'center' },
   itemActive: {
-    backgroundColor: colors.background,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 1 },
+    backgroundColor: colors.primary,
     elevation: 2,
   },
   text: { color: colors.textMuted, fontWeight: '500' },
-  textActive: { color: colors.text, fontWeight: '600' },
+  textActive: { color: '#fff', fontWeight: '600' },
 });

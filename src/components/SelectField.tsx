@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: spacing.md,
     paddingVertical: 12,
-    backgroundColor: colors.background,
+    backgroundColor: colors.card,
   },
   disabled: { opacity: 0.5 },
   value: { fontSize: 16, color: colors.text },
